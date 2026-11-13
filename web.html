@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09070f">
+  <title>Lucky Number — Guess the Number</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #09070f;
+      color: #f7f3ff;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(125, 55, 212, .22), transparent 42%),
+        radial-gradient(ellipse at 100% 100%, rgba(83, 35, 142, .16), transparent 38%),
+        #09070f;
+    }
+
+    .game-card {
+      width: min(100%, 440px);
+      position: relative;
+      padding: 42px 34px 34px;
+      border: 1px solid rgba(190, 145, 255, .2);
+      border-radius: 26px;
+      background: linear-gradient(155deg, rgba(30, 20, 45, .96), rgba(15, 12, 24, .98));
+      box-shadow: 0 28px 90px rgba(0, 0, 0, .48), 0 0 55px rgba(130, 62, 220, .1);
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: #c5a5ff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before, .eyebrow::after {
+      content: "";
+      width: 18px;
+      height: 1px;
+      background: #8050c7;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 8vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -.055em;
+    }
+
+    h1 span {
+      color: #b98aff;
+      text-shadow: 0 0 28px rgba(174, 116, 255, .28);
+    }
+
+    .subtitle {
+      margin: 15px 0 30px;
+      color: #a69bb8;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .number-range {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .number-range span {
+      display: grid;
+      width: 29px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid rgba(185, 138, 255, .18);
+      border-radius: 9px;
+      background: rgba(143, 81, 218, .08);
+      color: #c7a8f5;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #d9cdec;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      height: 58px;
+      border: 1px solid #493267;
+      border-radius: 13px;
+      outline: none;
+      background: rgba(8, 6, 14, .78);
+      color: #fff;
+      font: inherit;
+      font-size: 21px;
+      font-weight: 700;
+      text-align: center;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    input::placeholder { color: #685c78; }
+    input:focus {
+      border-color: #a66af2;
+      box-shadow: 0 0 0 4px rgba(166, 106, 242, .13);
+    }
+
+    input:disabled { opacity: .6; }
+
+    button {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 15px;
+      border: 0;
+      border-radius: 13px;
+      background: linear-gradient(100deg, #8d45df, #b16af4);
+      box-shadow: 0 9px 26px rgba(139, 67, 220, .25);
+      color: white;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      transition: transform .2s, filter .2s, box-shadow .2s;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 12px 30px rgba(139, 67, 220, .36);
+    }
+
+    button:active:not(:disabled) { transform: translateY(0); }
+    button:disabled { cursor: default; opacity: .58; }
+
+    .message {
+      min-height: 48px;
+      display: grid;
+      place-items: center;
+      margin-top: 20px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: #aa9bbd;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .message.success {
+      background: rgba(86, 211, 153, .09);
+      color: #83e7b7;
+    }
+
+    .message.failure {
+      background: rgba(178, 120, 255, .09);
+      color: #d0adff;
+    }
+
+    .footer {
+      margin-top: 23px;
+      color: #665b74;
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    @media (max-width: 420px) {
+      .game-card { padding: 36px 23px 27px; }
+      .number-range { gap: 5px; }
+      .number-range span { width: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-card">
+    <div class="eyebrow">A little luck, a little skill</div>
+    <h1>Guess the <span>Number</span></h1>
+    <p class="subtitle">I'm thinking of a number. Can you guess what it is?</p>
+
+    <div class="number-range" aria-label="Number range from zero to ten">
+      <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+      <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+    </div>
+
+    <form id="guess-form">
+      <label for="guess">Your guess</label>
+      <input id="guess" name="guess" type="number" min="0" max="10" step="1" placeholder="0 — 10" inputmode="numeric" required autocomplete="off">
+      <button id="guess-button" type="submit">MAKE A GUESS</button>
+    </form>
+
+    <div id="message" class="message" role="status" aria-live="polite">Enter a number and test your luck.</div>
+    <div class="footer">ONE NUMBER · ELEVEN POSSIBILITIES</div>
+  </main>
+
+  <script>
+    const form = document.getElementById('guess-form');
+    const input = document.getElementById('guess');
+    const button = document.getElementById('guess-button');
+    const message = document.getElementById('message');
+    let secretNumber = Math.floor(Math.random() * 11);
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const guess = Number(input.value);
+
+      if (input.value.trim() === '' || !Number.isInteger(guess) || guess < 0 || guess > 10) {
+        message.className = 'message failure';
+        message.textContent = 'Please enter a whole number from 0 to 10.';
+        input.focus();
+        return;
+      }
+
+      input.disabled = true;
+      button.textContent = 'PLAY AGAIN';
+      message.className = guess === secretNumber ? 'message success' : 'message failure';
+      message.textContent = guess === secretNumber
+        ? 'Congratulations! You guessed the number!'
+        : `Better luck next time! The number was ${secretNumber}.`;
+
+      button.type = 'button';
+      button.addEventListener('click', resetGame, { once: true });
+    });
+
+    function resetGame() {
+      secretNumber = Math.floor(Math.random() * 11);
+      input.value = '';
+      input.disabled = false;
+      button.textContent = 'MAKE A GUESS';
+      button.type = 'submit';
+      message.className = 'message';
+      message.textContent = 'A new number is ready. Give it another try!';
+      input.focus();
+    }
+  </script>
+</body>
+</html>
